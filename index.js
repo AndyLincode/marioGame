@@ -3,6 +3,7 @@ const context = canvas.getContext("2d");
 const platformImage = document.querySelector("#platform");
 const backgroundImage = document.querySelector("#backgroundImg");
 const hillsImage = document.querySelector("#hills");
+const platformSmallTall = document.querySelector("#platformSmallTall");
 
 canvas.width = 1024;
 canvas.height = 576;
@@ -11,7 +12,7 @@ const gravity = 1.5;
 
 class Player {
   constructor() {
-    this.speed = 8;
+    this.speed = 9;
     this.position = {
       x: 100,
       y: 100,
@@ -74,19 +75,8 @@ class GenericObject {
 }
 
 let player = new Player();
-let platforms = [
-  new Platform({ x: -1, y: 470, image: platformImage }),
-  new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
-  new Platform({
-    x: platformImage.width * 2 + 100,
-    y: 470,
-    image: platformImage,
-  }),
-];
-let genericObjects = [
-  new GenericObject({ x: -1, y: -1, image: backgroundImage }),
-  new GenericObject({ x: -1, y: -1, image: hillsImage }),
-];
+let platforms = [];
+let genericObjects = [];
 
 let keys = {
   right: {
@@ -102,10 +92,35 @@ let scrollOffset = 0;
 function init() {
   player = new Player();
   platforms = [
+    new Platform({
+      x:
+        platformImage.width * 4 +
+        300 -
+        2 +
+        platformImage.width -
+        platformSmallTall.width,
+      y: 270,
+      image: platformSmallTall,
+    }),
     new Platform({ x: -1, y: 470, image: platformImage }),
     new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
     new Platform({
       x: platformImage.width * 2 + 100,
+      y: 470,
+      image: platformImage,
+    }),
+    new Platform({
+      x: platformImage.width * 3 + 300,
+      y: 470,
+      image: platformImage,
+    }),
+    new Platform({
+      x: platformImage.width * 4 + 300 - 2,
+      y: 470,
+      image: platformImage,
+    }),
+    new Platform({
+      x: platformImage.width * 5 + 650 - 2,
       y: 470,
       image: platformImage,
     }),
@@ -142,7 +157,10 @@ function animate() {
   player.update();
   if (keys.right.pressed && player.position.x < 500) {
     player.velocity.x = player.speed;
-  } else if (keys.left.pressed && player.position.x > 100) {
+  } else if (
+    (keys.left.pressed && player.position.x > 100) ||
+    (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
+  ) {
     player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
@@ -155,7 +173,7 @@ function animate() {
       genericObjects.forEach((genericObject) => {
         genericObject.position.x -= player.speed * 0.66;
       });
-    } else if (keys.left.pressed) {
+    } else if (keys.left.pressed && scrollOffset > 0) {
       scrollOffset -= player.speed;
       platforms.forEach((platform) => {
         platform.position.x += player.speed;
@@ -179,7 +197,7 @@ function animate() {
     }
   });
   // win condition
-  if (scrollOffset > 2000) {
+  if (scrollOffset > platformImage.width * 5 + 350 - 2) {
     console.log("Win");
   }
 
@@ -189,12 +207,13 @@ function animate() {
   }
 }
 
+init();
 animate();
 
 addEventListener("keydown", ({ key }) => {
   switch (key) {
     case "ArrowUp":
-      player.velocity.y -= 20;
+      player.velocity.y -= 25;
       break;
     case "ArrowDown":
       break;
