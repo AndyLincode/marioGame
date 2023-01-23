@@ -145,7 +145,7 @@ function init() {
     new Platform({
       x:
         platformImage.width * 4 +
-        300 -
+        400 -
         2 +
         platformImage.width -
         platformSmallTall.width,
@@ -155,22 +155,22 @@ function init() {
     new Platform({ x: -1, y: 470, image: platformImage }),
     new Platform({ x: platformImage.width - 3, y: 470, image: platformImage }),
     new Platform({
-      x: platformImage.width * 2 + 100,
+      x: platformImage.width * 2 + 250,
       y: 470,
       image: platformImage,
     }),
     new Platform({
-      x: platformImage.width * 3 + 300,
+      x: platformImage.width * 3 + 400,
       y: 470,
       image: platformImage,
     }),
     new Platform({
-      x: platformImage.width * 4 + 300 - 2,
+      x: platformImage.width * 4 + 400 - 2,
       y: 470,
       image: platformImage,
     }),
     new Platform({
-      x: platformImage.width * 5 + 750 - 2,
+      x: platformImage.width * 5 + 850 - 2,
       y: 470,
       image: platformImage,
     }),
@@ -215,7 +215,10 @@ function animate() {
   } else {
     player.velocity.x = 0;
 
-    if (keys.right.pressed) {
+    if (
+      keys.right.pressed &&
+      scrollOffset < platformImage.width * 5 + 780 - 2
+    ) {
       scrollOffset += player.speed;
       platforms.forEach((platform) => {
         platform.position.x -= player.speed;
@@ -284,8 +287,13 @@ function animate() {
   }
 
   // win condition
-  if (scrollOffset > platformImage.width * 5 + 450 - 2) {
+  if (scrollOffset > platformImage.width * 5 + 750 - 2) {
     console.log("Win");
+    context.font = "40px Arial";
+    context.fillStyle = "black";
+    context.fillText("END", canvas.width / 2, canvas.height / 2);
+    context.fillStyle = "white";
+    context.fillText("END", canvas.width / 2 + 2, canvas.height / 2 + 2);
   }
 
   // lose condition
