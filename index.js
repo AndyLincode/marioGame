@@ -5,6 +5,11 @@ const backgroundImage = document.querySelector("#backgroundImg");
 const hillsImage = document.querySelector("#hills");
 const platformSmallTall = document.querySelector("#platformSmallTall");
 
+const spriteRunLeft = document.querySelector("#spriteRunLeft");
+const spriteRunRight = document.querySelector("#spriteRunRight");
+const spriteStandLeft = document.querySelector("#spriteStandLeft");
+const spriteStandRight = document.querySelector("#spriteStandRight");
+
 canvas.width = 1024;
 canvas.height = 576;
 
@@ -21,16 +26,60 @@ class Player {
       x: 0,
       y: 0,
     };
-    this.width = 30;
-    this.height = 30;
+    this.width = 66;
+    this.height = 150;
+
+    this.image = spriteStandRight;
+    this.frames = 0;
+    this.sprites = {
+      stand: {
+        right: spriteStandRight,
+        left: spriteStandLeft,
+        cropWidth: 177,
+        width: 66,
+      },
+      run: {
+        right: spriteRunRight,
+        left: spriteRunLeft,
+        cropWidth: 341,
+        width: 127.875,
+      },
+    };
+
+    this.currentSprite = this.sprites.stand.right;
+    this.currentCropWidth = 177;
   }
 
   draw() {
-    context.fillStyle = "red";
-    context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    context.drawImage(
+      this.currentSprite,
+      this.currentCropWidth * this.frames,
+      0,
+      this.currentCropWidth,
+      400,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
   }
 
   update() {
+    this.frames++;
+
+    if (
+      this.frames > 59 &&
+      (this.currentSprite === this.sprites.stand.right ||
+        this.currentSprite === this.sprites.stand.left)
+    )
+      this.frames = 0;
+    else if (
+      this.frames > 29 &&
+      (this.currentSprite === this.sprites.run.right ||
+        this.currentSprite === this.sprites.run.left)
+    )
+      this.frames = 0;
+
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -77,6 +126,7 @@ class GenericObject {
 let player = new Player();
 let platforms = [];
 let genericObjects = [];
+let lastKey;
 
 let keys = {
   right: {
@@ -120,7 +170,7 @@ function init() {
       image: platformImage,
     }),
     new Platform({
-      x: platformImage.width * 5 + 650 - 2,
+      x: platformImage.width * 5 + 750 - 2,
       y: 470,
       image: platformImage,
     }),
@@ -196,8 +246,45 @@ function animate() {
       player.velocity.y = 0;
     }
   });
+
+  // sprite switching
+  if (
+    keys.right.pressed &&
+    lastKey === "ArrowRight" &&
+    player.currentSprite !== player.sprites.run.right
+  ) {
+    player.frames = 1;
+    player.currentSprite = player.sprites.run.right;
+    player.currentCropWidth = player.sprites.run.cropWidth;
+    player.width = player.sprites.run.width;
+  } else if (
+    keys.left.pressed &&
+    lastKey === "ArrowLeft" &&
+    player.currentSprite !== player.sprites.run.left
+  ) {
+    player.currentSprite = player.sprites.run.left;
+    player.currentCropWidth = player.sprites.run.cropWidth;
+    player.width = player.sprites.run.width;
+  } else if (
+    !keys.left.pressed &&
+    lastKey === "ArrowLeft" &&
+    player.currentSprite !== player.sprites.stand.left
+  ) {
+    player.currentSprite = player.sprites.stand.left;
+    player.currentCropWidth = player.sprites.stand.cropWidth;
+    player.width = player.sprites.stand.width;
+  } else if (
+    !keys.right.pressed &&
+    lastKey === "ArrowRight" &&
+    player.currentSprite !== player.sprites.stand.right
+  ) {
+    player.currentSprite = player.sprites.stand.right;
+    player.currentCropWidth = player.sprites.stand.cropWidth;
+    player.width = player.sprites.stand.width;
+  }
+
   // win condition
-  if (scrollOffset > platformImage.width * 5 + 350 - 2) {
+  if (scrollOffset > platformImage.width * 5 + 450 - 2) {
     console.log("Win");
   }
 
@@ -219,9 +306,11 @@ addEventListener("keydown", ({ key }) => {
       break;
     case "ArrowLeft":
       keys.left.pressed = true;
+      lastKey = "ArrowLeft";
       break;
     case "ArrowRight":
       keys.right.pressed = true;
+      lastKey = "ArrowRight";
       break;
   }
 });
