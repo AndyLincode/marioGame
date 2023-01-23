@@ -11,6 +11,7 @@ const gravity = 1.5;
 
 class Player {
   constructor() {
+    this.speed = 8;
     this.position = {
       x: 100,
       y: 100,
@@ -140,27 +141,27 @@ function animate() {
   });
   player.update();
   if (keys.right.pressed && player.position.x < 500) {
-    player.velocity.x = 3.5;
+    player.velocity.x = player.speed;
   } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -3.5;
+    player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
 
     if (keys.right.pressed) {
-      scrollOffset += 3.5;
+      scrollOffset += player.speed;
       platforms.forEach((platform) => {
-        platform.position.x -= 3.5;
+        platform.position.x -= player.speed;
       });
       genericObjects.forEach((genericObject) => {
-        genericObject.position.x -= 1.5;
+        genericObject.position.x -= player.speed * 0.66;
       });
     } else if (keys.left.pressed) {
-      scrollOffset -= 3.5;
+      scrollOffset -= player.speed;
       platforms.forEach((platform) => {
-        platform.position.x += 3.5;
+        platform.position.x += player.speed;
       });
       genericObjects.forEach((genericObject) => {
-        genericObject.position.x += 1.5;
+        genericObject.position.x += player.speed * 0.66;
       });
     }
   }
@@ -193,7 +194,7 @@ animate();
 addEventListener("keydown", ({ key }) => {
   switch (key) {
     case "ArrowUp":
-      player.velocity.y -= 30;
+      player.velocity.y -= 20;
       break;
     case "ArrowDown":
       break;
