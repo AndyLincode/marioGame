@@ -419,7 +419,6 @@ function animate() {
 
   // win condition
   if (scrollOffset > platformImage.width * 5 + 750 - 2) {
-    console.log("Win");
     context.font = "40px Arial";
     context.fillStyle = "black";
     context.fillText("END", canvas.width / 2, canvas.height / 2);
