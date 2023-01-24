@@ -4,6 +4,11 @@ const platformImage = document.querySelector("#platform");
 const backgroundImage = document.querySelector("#backgroundImg");
 const hillsImage = document.querySelector("#hills");
 const platformSmallTall = document.querySelector("#platformSmallTall");
+const e_commerce = document.querySelector("#e_commerce");
+const petBan = document.querySelector("#petBan");
+const calculator = document.querySelector("#calculator");
+const todo1 = document.querySelector("#todo1");
+const todo2 = document.querySelector("#todo2");
 
 const spriteRunLeft = document.querySelector("#spriteRunLeft");
 const spriteRunRight = document.querySelector("#spriteRunRight");
@@ -106,6 +111,7 @@ class Platform {
     context.drawImage(this.image, this.position.x, this.position.y);
   }
 }
+
 class GenericObject {
   constructor({ x, y, image }) {
     this.position = {
@@ -122,11 +128,67 @@ class GenericObject {
     context.drawImage(this.image, this.position.x, this.position.y);
   }
 }
+class ECommerce {
+  constructor({
+    x,
+    y,
+    image,
+    title,
+    width,
+    height,
+    titleX,
+    titleY,
+    frontColor,
+    backColor,
+  }) {
+    this.position = {
+      x,
+      y,
+    };
 
-let player = new Player();
+    this.image = image;
+    this.title = title;
+    this.titlePosition = {
+      titleX,
+      titleY,
+    };
+    this.textColor = {
+      frontColor,
+      backColor,
+    };
+    this.width = width;
+    this.height = height;
+  }
+
+  draw() {
+    context.drawImage(
+      this.image,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    );
+    context.font = "30px Arial";
+    context.fillStyle = this.textColor.backColor;
+    context.fillText(
+      this.title,
+      this.position.x - this.titlePosition.titleX,
+      this.position.y - this.titlePosition.titleY
+    );
+    context.fillStyle = this.textColor.frontColor;
+    context.fillText(
+      this.title,
+      this.position.x - (this.titlePosition.titleX - 2),
+      this.position.y - (this.titlePosition.titleY - 2)
+    );
+  }
+}
+
+let player;
 let platforms = [];
 let genericObjects = [];
 let lastKey;
+let eCommerce;
 
 let keys = {
   right: {
@@ -179,7 +241,68 @@ function init() {
     new GenericObject({ x: -1, y: -1, image: backgroundImage }),
     new GenericObject({ x: -1, y: -1, image: hillsImage }),
   ];
-
+  eCommerce = [
+    new ECommerce({
+      x: platformImage.width + 150,
+      y: 100,
+      image: petBan,
+      title: "PetBan(React+Node.js)",
+      width: 300,
+      height: 240,
+      titleX: 5,
+      titleY: 35,
+      frontColor: "#FF8C04",
+      backColor: "#FFEACF",
+    }),
+    new ECommerce({
+      x: platformImage.width * 2 + 300,
+      y: 100,
+      image: e_commerce,
+      title: "React E-Commerce (Mobile)",
+      width: 142,
+      height: 240,
+      titleX: 100,
+      titleY: 35,
+      frontColor: "#00A6D9",
+      backColor: "#D7F3FF",
+    }),
+    new ECommerce({
+      x: platformImage.width * 2.8 + 350,
+      y: 100,
+      image: calculator,
+      title: "Vue Calculator",
+      width: 142,
+      height: 240,
+      titleX: 30,
+      titleY: 35,
+      frontColor: "#00A6D9",
+      backColor: "#D7F3FF",
+    }),
+    new ECommerce({
+      x: platformImage.width * 3.2 + 350,
+      y: 100,
+      image: todo1,
+      title: "Vue Todo List",
+      width: 142,
+      height: 240,
+      titleX: 30,
+      titleY: 35,
+      frontColor: "#00A6D9",
+      backColor: "#D7F3FF",
+    }),
+    new ECommerce({
+      x: platformImage.width * 3.5 + 420,
+      y: 100,
+      image: todo2,
+      title: "Vue Todo List2 (with RWD)",
+      width: 142,
+      height: 240,
+      titleX: 50,
+      titleY: 35,
+      frontColor: "#00A6D9",
+      backColor: "#D7F3FF",
+    }),
+  ];
   keys = {
     right: {
       pressed: false,
@@ -196,7 +319,6 @@ function animate() {
   requestAnimationFrame(animate);
   context.fillStyle = "white";
   context.fillRect(0, 0, canvas.width, canvas.height);
-
   genericObjects.forEach((genericObject) => {
     genericObject.draw();
   });
@@ -204,11 +326,14 @@ function animate() {
   platforms.forEach((platform) => {
     platform.draw();
   });
+  eCommerce.forEach((eCommerce) => {
+    eCommerce.draw();
+  });
   player.update();
-  if (keys.right.pressed && player.position.x < 500) {
+  if (keys.right.pressed && player.position.x < 300) {
     player.velocity.x = player.speed;
   } else if (
-    (keys.left.pressed && player.position.x > 100) ||
+    (keys.left.pressed && player.position.x > 300) ||
     (keys.left.pressed && scrollOffset === 0 && player.position.x > 0)
   ) {
     player.velocity.x = -player.speed;
@@ -226,6 +351,9 @@ function animate() {
       genericObjects.forEach((genericObject) => {
         genericObject.position.x -= player.speed * 0.66;
       });
+      eCommerce.forEach((eCommerce) => {
+        eCommerce.position.x -= player.speed * 0.86;
+      });
     } else if (keys.left.pressed && scrollOffset > 0) {
       scrollOffset -= player.speed;
       platforms.forEach((platform) => {
@@ -233,6 +361,9 @@ function animate() {
       });
       genericObjects.forEach((genericObject) => {
         genericObject.position.x += player.speed * 0.66;
+      });
+      eCommerce.forEach((eCommerce) => {
+        eCommerce.position.x += player.speed * 0.86;
       });
     }
   }
